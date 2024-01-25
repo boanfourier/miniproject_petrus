@@ -40,7 +40,7 @@ class LoginPageState extends State<LoginPage> {
             ElevatedButton(
               child: const Text('Login'),
               onPressed: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(
                       builder: (context) =>

@@ -38,6 +38,7 @@ dependencies:
   http: ^1.2.0
 
 dev_dependencies:
+  intl: ^0.17.0
   flutter_test:
     sdk: flutter
 
@@ -50,7 +51,6 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
 # The following section is specific to Flutter packages.
 flutter:
 

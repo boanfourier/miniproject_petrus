@@ -40,6 +40,7 @@ class ChatRoomPageState extends State<ChatRoomPage> {
       print('Error fetching messages: $e');
     }
   }
+
   Future<void> _sendMessage() async {
     try {
       if (messageController.text.isNotEmpty) {
@@ -62,6 +63,7 @@ class ChatRoomPageState extends State<ChatRoomPage> {
       print('Error sending message: $e');
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,26 +77,79 @@ class ChatRoomPageState extends State<ChatRoomPage> {
               itemCount: messages.length,
               itemBuilder: (context, index) {
                 var message = messages[index];
+
                 return ListTile(
-                  leading: CircleAvatar(
-                    child: Text(message['username'][0].toUpperCase()),
+                  title: Align(
+                    alignment: message['username'] == widget.username
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: message['username'] == widget.username
+                            ? Colors.blue.withOpacity(0.8)
+                            : Colors.grey.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${message['text']}',
+                            style: TextStyle(
+                              color: message['username'] == widget.username
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                          Text(
+                            '${message['timestamp']}',
+                            textAlign: TextAlign.right,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: message['username'] == widget.username
+                                  ? Colors.white
+                                  : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  title: Text('${message['username']} : ${message['text']}'),
-                  subtitle: Text('Timestamp: ${message['timestamp']}'),
+                  subtitle: Align(
+                    alignment: message['username'] == widget.username
+                        ? Alignment.centerRight
+                        : Alignment.centerLeft,
+                    child: Text(
+                      '${message['username']}',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
                 );
               },
             ),
           ),
-          TextField(
-            controller: messageController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              labelText: 'Message',
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: messageController,
+                    decoration: const InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Message',
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: _sendMessage,
+                ),
+              ],
             ),
-          ),
-          ElevatedButton(
-            child: const Text('Send'),
-            onPressed: _sendMessage,
           ),
         ],
       ),
