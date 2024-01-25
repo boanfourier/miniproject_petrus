@@ -76,10 +76,11 @@ class HomePageState extends State<HomePage> {
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(<String, String>{
-          'id': widget.roomId,
-          'username': widget.username,
+          'from': from,
+          'to': to,
         }),
       );
+      //print(response);
       if (response.statusCode == 200) {
         var data = json.decode(response.body);
         if (data['data'] != null) {
@@ -128,7 +129,6 @@ class HomePageState extends State<HomePage> {
                         _controller.text,
                       );
                     },
-
                   ),
                 ],
               );
@@ -238,7 +238,7 @@ class HomePageState extends State<HomePage> {
                 MaterialPageRoute(
                   builder: (context) => ChatRoomPage(
                     roomId: roomId,
-                    username: widget.username,
+                    username: lastMessage?['username'],
                   ),
                 ),
               );

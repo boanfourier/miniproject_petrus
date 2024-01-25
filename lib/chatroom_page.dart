@@ -68,7 +68,7 @@ class ChatRoomPageState extends State<ChatRoomPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Room ${widget.roomId}'),
+        title: Text('${widget.username}'),
       ),
       body: Column(
         children: <Widget>[
