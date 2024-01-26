@@ -11,7 +11,6 @@ void main() {
 
 class ChatApp extends StatelessWidget {
   const ChatApp({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -19,8 +19,13 @@ class HomePageState extends State<HomePage> {
   List<String> rooms = [];
   Map<String, List<Map<String, dynamic>>> roomMessages = {};
 
+  List<dynamic> userName = [];
+  void test(String username) async{
+    userName = await getChatList(username);
+  }
   @override
   void initState() {
+    test(widget.username);
     super.initState();
     _getRooms();
   }
@@ -43,7 +48,6 @@ class HomePageState extends State<HomePage> {
       throw Exception('Failed to load rooms');
     }
   }
-
   _getRoomMessages() async {
     for (var roomId in rooms) {
       final response =
@@ -69,44 +73,32 @@ class HomePageState extends State<HomePage> {
     }
   }
   _createNewRoom(String from, String to) async {
-    try {
-      final response = await http.post(
-        Uri.parse('http://127.0.0.1:8080/api/room'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(<String, String>{
-          'from': from,
-          'to': to,
-        }),
-      );
-      //print(response);
-      if (response.statusCode == 200) {
-        var data = json.decode(response.body);
-        if (data['data'] != null) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => ChatRoomPage(
-                roomId: data['data']['roomId'],
-                username: widget.username,
-              ),
-            ),
-          );
-        } else {
-          print('Response data is null');
-        }
+    final response = await http.post(
+      Uri.parse('http://localhost:8080/api/room'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'from': from,
+        'to': to,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      var data = json.decode(response.body);
+      if (data['data'] != null) {
       } else {
-        print('Failed to create room. Status code: ${response.statusCode}');
+        print('Response data is null');
       }
-    } catch (e) {
-      print('An error occurred: $e');
+    } else {
+      throw Exception('Failed to create room');
     }
   }
 
   @override
   // In HomePageState
   Widget build(BuildContext context) {
+    test(widget.username);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
@@ -194,12 +186,12 @@ class HomePageState extends State<HomePage> {
           ],
         ),
       ),
-
       body: ListView.builder(
-
         itemCount: rooms.length,
         itemBuilder: (context, index) {
+         // print(roomMessages['username']);
           String roomId = rooms[index];
+
           var lastMessage =
           roomMessages[roomId] != null && roomMessages[roomId]!.isNotEmpty
               ? roomMessages[roomId]![0]
@@ -215,9 +207,7 @@ class HomePageState extends State<HomePage> {
               children: [
                 Expanded(
                   child: Text(
-                    lastMessage != null
-                        ? '${lastMessage['username']}'
-                        : 'No messages',
+                    userName[index],
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
@@ -232,13 +222,20 @@ class HomePageState extends State<HomePage> {
               lastMessage != null ? '${lastMessage['text']}' : '',
             ),
             onTap: () {
+
+              setState(() {
+                userName.clear();
+                test(widget.username);
+              });
               // Navigate to the chatroom page
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatRoomPage(
                     roomId: roomId,
-                    username: lastMessage?['username'],
+                    username: widget.username,
+                    selectedName: userName[index],
+
                   ),
                 ),
               );
@@ -263,3 +260,31 @@ class HomePageState extends State<HomePage> {
           (route) => false,
     );}
 }
+
+Future<List<dynamic>> getChatList(String username) async {
+  List<dynamic> listUsername = [];
+  var response = await http.get(Uri.parse('http://127.0.0.1:8080/api/room/${username}'));
+  //var b = await _repository!.getChat(username);
+  var data = jsonDecode(response!.body) as Map<String, dynamic>;
+  var a = data['data'] as List<dynamic>;
+  a.forEach((element) {
+    listUsername.add(element['users']);
+  });
+
+  List<dynamic> filteredNames = listUsername
+      .map((sublist) =>
+      sublist.where((name) => name != '${username}').toList())
+      .toList();
+  List<dynamic> flatList =
+  filteredNames.expand((sublist) => sublist).toList();
+
+  List<dynamic> allMessages = [];
+  for (var dataEntry in data['data']) {
+    List<dynamic> messages = dataEntry['messages'];
+    allMessages.addAll(messages);
+  }
+  print(allMessages);
+  print(flatList);
+  return flatList;
+}
+

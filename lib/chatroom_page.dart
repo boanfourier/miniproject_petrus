@@ -5,8 +5,9 @@ import 'dart:convert';
 class ChatRoomPage extends StatefulWidget {
   final String roomId;
   final String username;
+  final String selectedName;
 
-  const ChatRoomPage({Key? key, required this.roomId, required this.username})
+  const ChatRoomPage({Key? key, required this.roomId, required this.username, required this.selectedName})
       : super(key: key);
 
   @override
@@ -66,9 +67,10 @@ class ChatRoomPageState extends State<ChatRoomPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('${widget.username}'),
+        title: Text('${widget.selectedName}'),
       ),
       body: Column(
         children: <Widget>[
@@ -156,3 +158,8 @@ class ChatRoomPageState extends State<ChatRoomPage> {
     );
   }
 }
+
+
+
+
+
